@@ -3,16 +3,13 @@
 // require_once('models/Utilisateur.php');
 // $user = new Utilisateur;
 
-
 // $all = $user->findAll();
 // foreach ($all as $row) {
 //     echo $row['id_utilisateur'];
 // }
 
-
 // $id = $user->findBy('nom','TEST');
 // var_dump($id);
-
 
 // $user->insertInto([
 //     'email_utilisateur' => 'email@email.com',
@@ -21,8 +18,8 @@
 //     'mdp_utilisateur' => 'test'
 // ]);
 
-
 // $user->deleteBy('id', 10);
+
 
 require_once('./models/Utilisateur.php');
 require_once('Renderer.php');
@@ -166,7 +163,7 @@ class UtilisateurC extends Utilisateur {
                     $Err = "Le format de l'adresse email est invalide.";
                     break;
                 case 23:
-                    $Err = "Vous êtes déja inscrit. Connectez-vous : <a href='connexion.php'>ICI</>";
+                    $Err = "Vous êtes déja inscrit. Connectez-vous : <a href='index.php?controller=utilisateur&task=connec'>ICI</>";
                     break;
                 // prenom 5x
                 case 51:
