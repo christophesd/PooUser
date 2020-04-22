@@ -41,6 +41,20 @@ abstract class Model extends Database {
         $req->closeCursor();
     }
 
+    public function updateInto($data, $filter, $id)
+    {
+        $sql = "UPDATE {$this->_table} SET ";
+        foreach($data as $k=>$v)
+        {
+            $sql .= ' '.$k.' = '.$v.','; 
+        }
+        $sql = substr($sql,0,-1);
+        $sql .= " WHERE {$filter}_{$this->_table} = :id ";
+        $req = $this->_pdo->prepare($sql);
+        $req->execute(compact('id'));
+        $req->closeCursor();
+    }
+
     public function insertInto($data) 
     {
         $sql = 'INSERT INTO '.$this->_table.' (';
@@ -60,7 +74,6 @@ abstract class Model extends Database {
         $req = $this->_pdo->prepare($sql);
         $req->execute();
         $req->closeCursor();
-        return $item;
     }
 
 

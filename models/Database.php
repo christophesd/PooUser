@@ -9,9 +9,13 @@ abstract class Database {
 
         try {
 
-            $bdd = "mysql:host=localhost:3306;dbname=test";
-            $user = "root";
-            $pass = "rootroot";
+            // $bdd = "mysql:host=localhost:3306;dbname=test";
+            // $user = "root";
+            // $pass = "rootroot";
+
+            $bdd = "mysql:host=db5000303652.hosting-data.io;dbname=dbs296639";
+            $user = "dbu526615";
+            $pass = "5(9|zhXJ";
             
             // Je me connecte à ma bdd
             $pdo = new PDO($bdd, $user, $pass, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));

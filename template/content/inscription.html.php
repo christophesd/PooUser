@@ -1,6 +1,6 @@
 <div class="container mt-5">
     <div class="row">
-        <div class="col-6 mx-auto">
+        <div class="col-8 mx-auto">
 
             <!-- zone de inscription --> 
             <form action="index.php?controller=utilisateur&task=tinscrip" method="POST">

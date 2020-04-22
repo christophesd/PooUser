@@ -59,14 +59,32 @@ class UtilisateurC extends Utilisateur {
                 case 5:
                     $Err = "Votre mot de passe est incorrect.";
                     break;
+                case 6:
+                    $Err = "Vous n'avez pas validé votre adresse email.";
+                    break;
+                case 7:
+                    $Err = "Le lien de validation est incorrecte.";
+                    break;
                 default:
                     $Err = "Evitez de jouer avec l'url :D";
             } 
         }
+        $Val = htmlentities($_GET['val']);
+        if ($Val) {
+            switch ($Val) {
+                case 'ok':
+                    $Val = "Inscription réussi ! Veuilliez valider votre compte par mail.";
+                    break;
+                case 'email':
+                    $Val = "Votre adresse email a déjà été validé.";
+                    break;
+            }
+        }
+
 
         // Affichage
         $pageTitle = 'Connexion';
-        Renderer::render('connexion', compact('pageTitle', 'Err'));
+        Renderer::render('connexion', compact('pageTitle', 'Err', 'Val'));
 
     }
 
@@ -110,7 +128,11 @@ class UtilisateurC extends Utilisateur {
                 if ( $user["email_{$this->_table}"] === $email_utilisateur ) {
                     $error = false;
                     if ( password_verify($mdp_utilisateur, $user["mdp_{$this->_table}"]) ) {
-                        $id_utilisateur = $user["id_{$this->_table}"];
+                        if ( $user["token_{$this->_table}"] == NULL AND !empty($user["confirmat_{$this->_table}"]) ) {
+                            $id_utilisateur = $user["id_{$this->_table}"];
+                        } else {
+                            $Err = 6;
+                        }
                     } else {
                         $Err = 5;
                     }
@@ -163,7 +185,7 @@ class UtilisateurC extends Utilisateur {
                     $Err = "Le format de l'adresse email est invalide.";
                     break;
                 case 23:
-                    $Err = "Vous êtes déja inscrit. Connectez-vous : <a href='index.php?controller=utilisateur&task=connec'>ICI</>";
+                    $Err = "Vous êtes déja inscrit. Connectez-vous : <a href='index.php?controller=utilisateur&task=connec'>ICI</a>";
                     break;
                 // prenom 5x
                 case 51:
@@ -255,12 +277,16 @@ class UtilisateurC extends Utilisateur {
         // SI TOUT EST OK
         if ( $Err===0 AND !empty($nom_utilisateur) AND !empty($prenom_utilisateur) AND !empty($email_utilisateur) AND !empty($mdp_utilisateur) ) {
 
+            // Création du token 
+            $token_utilisateur = bin2hex( openssl_random_pseudo_bytes(20) );
+
             // REQ 3 ) Insertion de l'utilisateur
             $this->insertInto([
                 "email_{$this->_table}" => $email_utilisateur,
                 "prenom_{$this->_table}" => $prenom_utilisateur,
                 "nom_{$this->_table}" => $nom_utilisateur,
-                "mdp_{$this->_table}" => $mdp_utilisateur
+                "mdp_{$this->_table}" => $mdp_utilisateur,
+                "token_{$this->_table}" => $token_utilisateur
             ]);
 
             // REQ 4 ) Verif insertion de l'utilisateur
@@ -272,12 +298,31 @@ class UtilisateurC extends Utilisateur {
         }
 
         if ($Err === 0) {
-            // Création de la session
-            session_start();
-            $_SESSION["id_utilisateur"] = $utilisateur["id_{$this->_table}"];
+
+            // Envoie du token par mail 
+            $to      = $email_utilisateur;
+            $subject = 'Lien de confirmation de votre inscription.';
+            $message = '
+             <html>
+                <head>
+                    <title>Site.fr : Lien de confirmation de votre inscription.</title>
+                </head>
+                <body>
+                    <h3>Lien de validation de votre email :</h3>
+                    <p>Pour valider votre inscription veuiller cliquer sur ce lien : <a href="https://saidoun.simplon-charleville.fr/connec/index.php?controller=utilisateur&task=validt&id='.$utilisateur["id_{$this->_table}"].'&token='.$token_utilisateur.'" target="_blank">LIEN DE VALIDATION</a></p>
+                </body>
+            </html>
+            ';
+            $headers = "From: nicolas08@gmail.com \r\n";
+            $headers .= "Reply-To: nicolas08@gmail.com \r\n";
+            $headers .= "MIME-Version: 1.0\r\n";
+            $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+
+            mail($to, $subject, $message, $headers);
+
 
             // Redirection
-            header('location:index.php');
+            header('location:index.php?controller=utilisateur&task=connec&val=ok');
         } else {
             header('location:index.php?controller=utilisateur&task=inscrip&err='.$Err.'');
         }
@@ -289,6 +334,50 @@ class UtilisateurC extends Utilisateur {
     {
         $this->deleteBy('id', $_SESSION["id_utilisateur"]);
         $this->deco();
+    }
+
+    public function validt()
+    {
+        // Vérif utilisateur
+        $user = $this->findBy('id', htmlentities($_GET['id']) );
+
+        // Validation token
+        if ( !empty($user) AND 
+            $_GET['token'] == $user["token_{$this->_table}"] AND 
+            $user["confirmat_{$this->_table}"]  == NULL ) 
+        {
+            // Update token et confirmat
+            $this->updateInto([
+                "token_{$this->_table}" => "NULL",
+                "confirmat_{$this->_table}" => "NOW()"
+            ], 'id', $user["id_{$this->_table}"] );
+
+            // Nouvel vérif utilisateur
+            $user = $this->findBy('id', htmlentities($_GET['id']) );
+
+            // Si token validé
+            if ($user["token_{$this->_table}"]  == NULL AND 
+                !empty( $user["confirmat_{$this->_table}"] )) 
+            {
+                // Création de la session
+                session_start();
+                $_SESSION["id_utilisateur"] = $user["id_{$this->_table}"];
+
+                // Redirection
+                header('location:index.php');
+                exit();
+            }
+        } else {
+            // Redirection
+            header('location:index.php?controller=utilisateur&task=connec&err=7');
+            exit();
+        }
+        
+        if ( $user["token_{$this->_table}"] == NULL AND !empty($user["confirmat_{$this->_table}"]) ) {
+            // Redirection
+            header('location:index.php?controller=utilisateur&task=connec&val=email');
+            exit();
+        }
     }
 
 
