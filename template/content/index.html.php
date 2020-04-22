@@ -5,7 +5,7 @@
 
 
     <?php if (!empty($_SESSION["id_utilisateur"])) {?>
-        <p>Bonjour <?=$prenom?> ! Vous êtes bien connecté !</p>
+        <p>Bonjour <strong><?=$prenom?></strong> ! Vous êtes bien connecté !</p>
         <button onClick="del()" type="button" class="btn btn-outline-danger">Supprimer mon compte</button>
     <?php } else {?>
         <p>Vous n'êtes pas connecté.</p>
