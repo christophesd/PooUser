@@ -1,9 +1,5 @@
 <?php
+session_start();
 
-// Require
-require_once 'controllers/Render.php';
-
-// Affichage
-$pageTitle = 'Connexion';
-render('connexion', compact('pageTitle'));
-
+require_once('models/Application.php');
+Application::process();

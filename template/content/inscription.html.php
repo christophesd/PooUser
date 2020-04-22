@@ -2,8 +2,8 @@
     <div class="row">
         <div class="col-6 mx-auto">
 
-            <!-- zone de connexion --> 
-            <form action="index.php?controller=utilisateur&task=tconnec" method="POST">
+            <!-- zone de inscription --> 
+            <form action="index.php?controller=utilisateur&task=tinscrip" method="POST">
                 <?php if (!empty($Err)) {?>
                     <div class="alert alert-danger" role="alert">
                         <?=$Err?>
@@ -11,7 +11,17 @@
                 <?php } ?>
 
                 <div class="form-group">
-                    <label for="email">Email d'utilisateur</label>
+                    <label for="nom">Nom de l'utilisateur</label>
+                    <input type="text" name="nom_utilisateur" required class="form-control" id="nom"  placeholder="Nicolas">
+                </div>
+
+                <div class="form-group">
+                    <label for="prenom">Prenom de l'utilisateur</label>
+                    <input type="text" name="prenom_utilisateur" required class="form-control" id="prenom"  placeholder="Dupond">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email de l'utilisateur</label>
                     <input type="email" name="email_utilisateur" required class="form-control" id="email"  placeholder="name@example.com" aria-describedby="emailHelp">
                     <small id="emailHelp" class="form-text text-muted">Nous ne partagerons pas votre email.</small>
                 </div>
@@ -21,7 +31,7 @@
                     <input type="password"  name="mdp_utilisateur" required class="form-control" id="mdp">
                 </div>
 
-                <button type="submit" class="btn btn-primary">Connexion</button>
+                <button type="submit" class="btn btn-primary">Inscription</button>
 
             </form>
 
