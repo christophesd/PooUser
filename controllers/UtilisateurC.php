@@ -5,7 +5,7 @@
 
 // $all = $user->findAll();
 // foreach ($all as $row) {
-//     echo $row['id_utilisateur'];
+//     echo $row["id_{$this->_table}"];
 // }
 
 // $id = $user->findBy('nom','TEST');
@@ -31,7 +31,7 @@ class UtilisateurC extends Utilisateur {
     {
         // Requêtes
         $user = $this->findBy('id', $_SESSION["id_utilisateur"]);
-        $prenom = $user['prenom_utilisateur'];
+        $prenom = $user["prenom_{$this->_table}"];
 
         // Affichage
         $pageTitle = 'Accueil';
@@ -107,10 +107,10 @@ class UtilisateurC extends Utilisateur {
             $users = $this->findAll();
             $error = true;
             foreach ( $users as $user ) { 
-                if ( $user['email_utilisateur'] === $email_utilisateur ) {
+                if ( $user["email_{$this->_table}"] === $email_utilisateur ) {
                     $error = false;
-                    if ( password_verify($mdp_utilisateur, $user['mdp_utilisateur']) ) {
-                        $id_utilisateur = $user['id_utilisateur'];
+                    if ( password_verify($mdp_utilisateur, $user["mdp_{$this->_table}"]) ) {
+                        $id_utilisateur = $user["id_{$this->_table}"];
                     } else {
                         $Err = 5;
                     }
