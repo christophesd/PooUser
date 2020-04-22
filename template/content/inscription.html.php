@@ -5,8 +5,11 @@
             <!-- zone de inscription --> 
             <form action="index.php?controller=utilisateur&task=tinscrip" method="POST">
                 <?php if (!empty($Err)) {?>
-                    <div class="alert alert-danger" role="alert">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         <?=$Err?>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
                 <?php } ?>
 

@@ -257,16 +257,16 @@ class UtilisateurC extends Utilisateur {
 
             // REQ 3 ) Insertion de l'utilisateur
             $this->insertInto([
-                'email_utilisateur' => $email_utilisateur,
-                'prenom_utilisateur' => $prenom_utilisateur,
-                'nom_utilisateur' => $nom_utilisateur,
-                'mdp_utilisateur' => $mdp_utilisateur
+                "email_{$this->_table}" => $email_utilisateur,
+                "prenom_{$this->_table}" => $prenom_utilisateur,
+                "nom_{$this->_table}" => $nom_utilisateur,
+                "mdp_{$this->_table}" => $mdp_utilisateur
             ]);
 
             // REQ 4 ) Verif insertion de l'utilisateur
 
             $utilisateur = $this->findBy('email', $email_utilisateur);
-            if ( empty($utilisateur["id_utilisateur"]) ) {
+            if ( empty($utilisateur["id_{$this->_table}"]) ) {
                 $Err = 71;
             }
         }
@@ -274,7 +274,7 @@ class UtilisateurC extends Utilisateur {
         if ($Err === 0) {
             // Création de la session
             session_start();
-            $_SESSION["id_utilisateur"] = $utilisateur["id_utilisateur"];
+            $_SESSION["id_utilisateur"] = $utilisateur["id_{$this->_table}"];
 
             // Redirection
             header('location:index.php');

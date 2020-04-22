@@ -8,9 +8,6 @@ abstract class Database {
     public function __construct() {
 
         try {
-            // $bdd = "mysql:host=db5000303652.hosting-data.io;dbname=dbs296639";
-            // $user = "dbu526615";
-            // $pass = "5(9|zhXJ";
 
             $bdd = "mysql:host=localhost:3306;dbname=test";
             $user = "root";
