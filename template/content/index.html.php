@@ -1,9 +1,24 @@
-<h1>Accueil</h1>
+<div class="container">
+
+    <h1>Accueil</h1>
 
 
 
-<?php if (!empty($_SESSION["id_utilisateur"])) {?>
-    <p>Vous êtes connecté !</p>
-<?php } else {?>
-    <p>Vous n'êtes pas connecté.</p>
-<?php } ?>
+    <?php if (!empty($_SESSION["id_utilisateur"])) {?>
+        <p>Bonjour <?=$prenom?> ! Vous êtes bien connecté !</p>
+        <button onClick="del()" type="button" class="btn btn-outline-danger">Supprimer mon compte</button>
+    <?php } else {?>
+        <p>Vous n'êtes pas connecté.</p>
+    <?php } ?>
+
+</div>
+
+
+<script>
+    function del() {
+        if(confirm("Voulez vous vraiment supprimer votre compte ?"))
+        {
+            document.location.href="index.php?controller=utilisateur&task=del";
+        }
+    }
+</script>

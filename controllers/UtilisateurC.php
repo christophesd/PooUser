@@ -32,9 +32,13 @@ class UtilisateurC extends Utilisateur {
 
     public function index() 
     {
+        // Requêtes
+        $user = $this->findBy('id', $_SESSION["id_utilisateur"]);
+        $prenom = $user['prenom_utilisateur'];
+
         // Affichage
         $pageTitle = 'Accueil';
-        Renderer::render('index', compact('pageTitle'));
+        Renderer::render('index', compact('pageTitle', 'prenom'));
     }
 
     public function connec() 
@@ -142,11 +146,9 @@ class UtilisateurC extends Utilisateur {
         exit();
     }
 
-
     public function inscrip() 
     {   
         // Err
-
         $Err = htmlentities($_GET['err']);
         if ($Err) {
             switch ($Err) {
@@ -192,7 +194,6 @@ class UtilisateurC extends Utilisateur {
         Renderer::render('inscription', compact('pageTitle', 'Err'));
 
     }
-
 
     public function tinscrip() 
     {
@@ -289,6 +290,11 @@ class UtilisateurC extends Utilisateur {
 
     }
 
+    public function del()
+    {
+        $this->deleteBy('id', $_SESSION["id_utilisateur"]);
+        $this->deco();
+    }
 
 
 }
