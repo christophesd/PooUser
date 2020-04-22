@@ -112,8 +112,7 @@ class UtilisateurC extends Utilisateur {
             foreach ( $users as $user ) { 
                 if ( $user['email_utilisateur'] === $email_utilisateur ) {
                     $error = false;
-                    // if ( password_verify($mdp_utilisateur, $user['mdp_utilisateur']) ) {       <- HASH
-                    if ( $user['mdp_utilisateur'] === $mdp_utilisateur ) {
+                    if ( password_verify($mdp_utilisateur, $user['mdp_utilisateur']) ) {
                         $id_utilisateur = $user['id_utilisateur'];
                     } else {
                         $Err = 5;
@@ -220,8 +219,7 @@ class UtilisateurC extends Utilisateur {
             if ( !preg_match('#^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$#', $mdp_utilisateur_tp) ) {
                 $Err =12;
             } else {
-                // $mdp_utilisateur = password_hash($mdp_utilisateur_tp, PASSWORD_DEFAULT);    -> HASH
-                $mdp_utilisateur = $mdp_utilisateur_tp; 
+                $mdp_utilisateur = password_hash($mdp_utilisateur_tp, PASSWORD_DEFAULT);
             }
         }
         // email
