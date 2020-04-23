@@ -1,5 +1,7 @@
 <div class="container mt-5">
 
+    <?=Alert::message();?>
+    
     <h1>Accueil</h1>
 
 

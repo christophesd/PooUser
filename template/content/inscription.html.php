@@ -1,17 +1,15 @@
 <div class="container mt-5">
     <div class="row">
-        <div class="col-8 mx-auto">
+        <div class="col-10 col-md-7 mx-auto">
 
             <!-- zone de inscription --> 
             <form action="index.php?controller=utilisateur&task=tinscrip" method="POST">
-                <?php if (!empty($Err)) {?>
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <?=$Err?>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                <?php } ?>
+
+                <div class="form-group text-center">
+                    <h3>Inscription :</h3>
+                </div>
+
+                <?=Alert::message();?>
 
                 <div class="form-group">
                     <label for="nom">Nom de l'utilisateur</label>
