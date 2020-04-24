@@ -1,28 +1,8 @@
 <?php 
 
-// require_once('models/Utilisateur.php');
-// $user = new Utilisateur;
-
-// $all = $user->findAll();
-// foreach ($all as $row) {
-//     echo $row["id_{$this->_table}"];
-// }
-
-// $id = $user->findBy('nom','TEST');
-// var_dump($id);
-
-// $user->insertInto([
-//     'email_utilisateur' => 'email@email.com',
-//     'prenom_utilisateur' => 'gerard',
-//     'nom_utilisateur' => 'dupont',
-//     'mdp_utilisateur' => 'test'
-// ]);
-
-// $user->deleteBy('id', 10);
-
-
 require_once('./models/Utilisateur.php');
 require_once('Renderer.php');
+
 
 class UtilisateurC extends Utilisateur {
 
@@ -43,9 +23,21 @@ class UtilisateurC extends Utilisateur {
         // Redirect index si déjà connecté
         $this->redirectIfConnec();
 
+        // Var du formulaire
+        $controller = 'utilisateur';
+        $task = 'tconnec';
+        $title = 'connexion';
+        $btm = 'connexion';
+
+        // Inputs du formulaire
+        ob_start();
+        Form::input('email', 'utilisateur', 'exemple@gmail.com', 'email de l\'utilisateur');
+        Form::input('mdp', 'utilisateur', 'mot de passe', 'mot de passe <small>(<a href="index.php?controller=utilisateur&task=oublie">Vous avez oublié votre mot de passe ?</a>)</small>', 'password');
+        $inputs = ob_get_clean();
+
         // Affichage
         $pageTitle = 'Connexion';
-        Renderer::render('connexion', compact('pageTitle'));
+        Renderer::render('form', compact('pageTitle', 'controller', 'task', 'title', 'btm', 'inputs'));
     }
 
     public function tconnec() 
@@ -99,7 +91,7 @@ class UtilisateurC extends Utilisateur {
                 $_SESSION['flash']['danger'] = "L'email indiqué n'existe pas.";
             }
         }
-        
+
         if ( empty($_SESSION['flash']) ) {
             // Création de la session
             session_start();
@@ -130,9 +122,23 @@ class UtilisateurC extends Utilisateur {
         // Redirect index si déjà connecté
         $this->redirectIfConnec();
 
+        // Var du formulaire
+        $controller = 'utilisateur';
+        $task = 'tinscrip';
+        $title = 'inscription';
+        $btm = 's\'inscrire';
+
+        // Inputs du formulaire
+        ob_start();
+        Form::input('nom', 'utilisateur', 'dupont', 'nom de l\'utilisateur');
+        Form::input('prenom', 'utilisateur', 'nicolas', 'prenom de l\'utilisateur');
+        Form::input('email', 'utilisateur', 'exemple@gmail.com', 'email de l\'utilisateur');
+        Form::input('mdp', 'utilisateur', 'mot de passe', '', 'password');
+        $inputs = ob_get_clean();
+
         // Affichage
         $pageTitle = 'Inscription';
-        Renderer::render('inscription', compact('pageTitle'));
+        Renderer::render('form', compact('pageTitle', 'controller', 'task', 'title', 'btm', 'inputs'));
 
     }
 
@@ -257,9 +263,21 @@ class UtilisateurC extends Utilisateur {
         // Redirect index si déjà connecté
         $this->redirectIfConnec();
 
+        // Var du formulaire
+        $controller = 'utilisateur';
+        $task = 'toublie';
+        $title = 'mot de passe oublié';
+        $btm = 'validation';
+        $p = 'nous allons vous envoyer un email de validation pour redéfinir votre mot de passe.';
+
+        // Inputs du formulaire
+        ob_start();
+        Form::input('email', 'utilisateur', 'exemple@gmail.com', 'email de l\'utilisateur');
+        $inputs = ob_get_clean();
+
         // Affichage
         $pageTitle = 'Mot de passe oublié';
-        Renderer::render('oublie', compact('pageTitle'));
+        Renderer::render('form', compact('pageTitle', 'controller', 'task', 'title', 'btm', 'p', 'inputs'));
     }
 
     public function toublie() 
@@ -345,19 +363,25 @@ class UtilisateurC extends Utilisateur {
         // Redirect si token faux
         $id = htmlentities($_GET['id']);
         $token = htmlentities($_GET['token']);
-        $user = $this->findBy('id', $id);
-        if ( empty($user) ||
-            $token != $user["token_{$this->_table}"] ||
-            empty($user["confirmat_{$this->_table}"]) ) 
-        {
-            $_SESSION['flash']['success'] = "Vous ne pouvez pas accèder à cette page.";
-            header('location:index.php');
-            exit();
-        }
+        $this->redirectIfBadToken($id, $token);
+
+        // Var du formulaire
+        $controller = 'utilisateur';
+        $task = 'mdpt';
+        $get = '&id='.$id.'&token='.$token;
+        $title = 'mot de passe oublié';
+        $btm = 'validation';
+        $p = 'veuillez saisir un nouveau mot de passe.';
+
+        // Inputs du formulaire
+        ob_start();
+        Form::input('mdp', 'utilisateur', 'nouveau mot de passe', '', 'password');
+        Form::input('mdp2', 'utilisateur', 'nouveau mot de passe', 'confirmation du mot de passe', 'password');
+        $inputs = ob_get_clean();
 
         // Affichage
         $pageTitle = 'Mot de passe oublié';
-        Renderer::render('mdp', compact('pageTitle', 'id', 'token'));
+        Renderer::render('form', compact('pageTitle', 'controller', 'task', 'get', 'title', 'btm', 'p', 'inputs'));
     }
 
     public function mdpt()
@@ -368,15 +392,7 @@ class UtilisateurC extends Utilisateur {
         // Redirect si token faux
         $id = htmlentities($_GET['id']);
         $token = htmlentities($_GET['token']);
-        $user = $this->findBy('id', $id);
-        if ( empty($user) ||
-            $token != $user["token_{$this->_table}"] ||
-            empty($user["confirmat_{$this->_table}"]) ) 
-        {
-            $_SESSION['flash']['success'] = "Vous ne pouvez pas accèder à cette page.";
-            header('location:index.php');
-            exit();
-        }
+        $this->redirectIfBadToken($id, $token);
 
         // Init var
         $mdp_utilisateur = $id_utilisateur = "";
@@ -493,6 +509,19 @@ class UtilisateurC extends Utilisateur {
         if ( !empty($_SESSION["id_utilisateur"]) ) 
         {
             $_SESSION['flash']['success'] = "Vous êtes déjà connecté.";
+            header('location:index.php');
+            exit();
+        }
+    }
+
+    public function redirectIfBadToken($id, $token)
+    {
+        $user = $this->findBy('id', $id);
+        if ( empty($user) ||
+            $token != $user["token_{$this->_table}"] ||
+            empty($user["confirmat_{$this->_table}"]) ) 
+        {
+            $_SESSION['flash']['success'] = "Vous ne pouvez pas accèder à cette page.";
             header('location:index.php');
             exit();
         }
