@@ -11,28 +11,12 @@
 
                 <?=Alert::message();?>
 
-                <div class="form-group">
-                    <label for="nom">Nom de l'utilisateur</label>
-                    <input type="text" name="nom_utilisateur" required class="form-control" id="nom"  placeholder="Nicolas">
-                </div>
+                <?=Form::input('nom', 'utilisateur', 'dupont', 'nom de l\'utilisateur')?>
+                <?=Form::input('prenom', 'utilisateur', 'nicolas', 'prenom de l\'utilisateur')?>
+                <?=Form::input('email', 'utilisateur', 'exemple@gmail.com', 'email de l\'utilisateur')?>
+                <?=Form::input('mdp', 'utilisateur', 'mot de passe', '', 'password')?>
 
-                <div class="form-group">
-                    <label for="prenom">Prenom de l'utilisateur</label>
-                    <input type="text" name="prenom_utilisateur" required class="form-control" id="prenom"  placeholder="Dupond">
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email de l'utilisateur</label>
-                    <input type="email" name="email_utilisateur" required class="form-control" id="email"  placeholder="name@example.com" aria-describedby="emailHelp">
-                    <small id="emailHelp" class="form-text text-muted">Nous ne partagerons pas votre email.</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="mdp">Mot de passe</label>
-                    <input type="password"  name="mdp_utilisateur" required class="form-control" id="mdp">
-                </div>
-
-                <button type="submit" class="btn btn-primary">Inscription</button>
+                <button type="submit" class="btn btn-primary">S'inscrire</button>
 
             </form>
 

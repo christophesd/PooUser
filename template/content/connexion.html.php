@@ -11,16 +11,8 @@
 
                 <?=Alert::message();?>
 
-                <div class="form-group">
-                    <label for="email">Email d'utilisateur</label>
-                    <input type="email" name="email_utilisateur" required class="form-control" id="email"  placeholder="name@example.com" aria-describedby="emailHelp">
-                    <small id="emailHelp" class="form-text text-muted">Nous ne partagerons pas votre email.</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="mdp">Mot de passe</label>
-                    <input type="password"  name="mdp_utilisateur" required class="form-control" id="mdp">
-                </div>
+                <?=Form::input('email', 'utilisateur', 'exemple@gmail.com', 'email de l\'utilisateur')?>
+                <?=Form::input('mdp', 'utilisateur', 'mot de passe', 'mot de passe <small>(<a href="index.php?controller=utilisateur&task=oublie">Vous avez oublié votre mot de passe ?</a>)</small>', 'password')?>
 
                 <button type="submit" class="btn btn-primary">Connexion</button>
 
