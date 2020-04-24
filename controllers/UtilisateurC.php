@@ -83,26 +83,23 @@ class UtilisateurC extends Utilisateur {
         if ( empty($_SESSION['flash']) AND !empty($email_utilisateur) AND !empty($mdp_utilisateur) ) {
 
             // Recherche de l'utilisateur
-            $users = $this->findAll();
-            $error = true;
-            foreach ( $users as $user ) { 
-                if ( $user["email_{$this->_table}"] === $email_utilisateur ) {
-                    $error = false;
-                    if ( password_verify($mdp_utilisateur, $user["mdp_{$this->_table}"]) ) {
-                        if ( !empty($user["confirmat_{$this->_table}"]) ) {
-                            $id_utilisateur = $user["id_{$this->_table}"];
-                        } else {
-                            $_SESSION['flash']['danger'] = "Vous n'avez pas validé votre adresse email.";
-                        }
+            $user = $this->findBy('email',$email_utilisateur);
+            if ( $user["email_{$this->_table}"] == $email_utilisateur ) {
+                $error = false;
+                if ( password_verify($mdp_utilisateur, $user["mdp_{$this->_table}"]) ) {
+                    if ( !empty($user["confirmat_{$this->_table}"]) ) {
+                        $id_utilisateur = $user["id_{$this->_table}"];
                     } else {
-                        $_SESSION['flash']['danger'] = "Votre mot de passe est incorrect.";
+                        $_SESSION['flash']['danger'] = "Vous n'avez pas validé votre adresse email.";
                     }
+                } else {
+                    $_SESSION['flash']['danger'] = "Votre mot de passe est incorrect.";
                 }
-            }
-            if ($error) {
+            } else {
                 $_SESSION['flash']['danger'] = "L'email indiqué n'existe pas.";
             }
         }
+        
         if ( empty($_SESSION['flash']) ) {
             // Création de la session
             session_start();
@@ -307,9 +304,8 @@ class UtilisateurC extends Utilisateur {
             
             // Update token et confirmat
             $this->updateInto([
-                "token_{$this->_table}" => "grgehtthr"
+                "token_{$this->_table}" => $token_utilisateur
             ], 'id', $user["id_{$this->_table}"] );
-
 
 
             // Envoie du token par mail 
@@ -322,7 +318,7 @@ class UtilisateurC extends Utilisateur {
                 </head>
                 <body>
                     <h3>Lien de réinitialisation de votre mot de passe :</h3>
-                    <p>Pour réinitialisation de votre mot de passe veuiller cliquer sur ce lien : <a href="https://saidoun.simplon-charleville.fr/connec/index.php?controller=utilisateur&task=mdp&id='.$utilisateur["id_{$this->_table}"].'&token='.$token_utilisateur.'" target="_blank">LIEN DE VALIDATION</a></p>
+                    <p>Pour réinitialisation de votre mot de passe veuiller cliquer sur ce lien : <a href="https://saidoun.simplon-charleville.fr/connec/index.php?controller=utilisateur&task=mdp&id='.$user["id_{$this->_table}"].'&token='.$token_utilisateur.'" target="_blank">LIEN DE VALIDATION</a></p>
                 </body>
             </html>
             ';
@@ -394,10 +390,10 @@ class UtilisateurC extends Utilisateur {
         }
 
         // Vérification champs
-        if ( empty($_POST["mdp_utilisateur"]) || empty($_POST["md2_utilisateur"]) ) {
+        if ( empty($_POST["mdp_utilisateur"]) || empty($_POST["mdp2_utilisateur"]) ) {
             $_SESSION['flash']['danger'] = "Veuillez saisir tous les champs.";
         } else {
-            if ( $_POST["mdp_utilisateur"] != $_POST["md2_utilisateur"] ) {
+            if ( $_POST["mdp_utilisateur"] != $_POST["mdp2_utilisateur"] ) {
                 $_SESSION['flash']['danger'] = "Veuillez saisir les mêmes mots de passe.";
             } else {
                 $mdp_utilisateur_tp = test_input($_POST["mdp_utilisateur"]);
@@ -416,8 +412,8 @@ class UtilisateurC extends Utilisateur {
             // Update mdp, token et confirmat
             $this->updateInto([
                 "mdp_{$this->_table}" => $mdp_utilisateur,
-                "token_{$this->_table}" => "NULL",
-                "confirmat_{$this->_table}" => "NOW()"
+                "token_{$this->_table}" => NULL,
+                "confirmat_{$this->_table}" => date("Y-m-d H:i:s")
             ], 'id', $user["id_{$this->_table}"] );
 
             // Redirection
@@ -453,8 +449,8 @@ class UtilisateurC extends Utilisateur {
         {
             // Update token et confirmat
             $this->updateInto([
-                "token_{$this->_table}" => "NULL",
-                "confirmat_{$this->_table}" => "NOW()"
+                "token_{$this->_table}" => NULL,
+                "confirmat_{$this->_table}" => date("Y-m-d H:i:s")
             ], 'id', $user["id_{$this->_table}"] );
 
             // Nouvel vérif utilisateur

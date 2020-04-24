@@ -46,7 +46,7 @@ abstract class Model extends Database {
         $sql = "UPDATE {$this->_table} SET ";
         foreach($data as $k=>$v)
         {
-            $sql .= ' '.$k.' = '.$v.' ,'; 
+            $sql .= ' '.$k.' = "'.$v.'" ,'; 
         }
         $sql = substr($sql,0,-1);
         $sql .= " WHERE {$filter}_{$this->_table} = :id ";
