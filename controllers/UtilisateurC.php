@@ -526,10 +526,10 @@ class UtilisateurC extends Utilisateur {
             header('location:index.php');
             exit();
         } else {
-            $time1 = new DateTime(date("Y-m-d H:i:s")); 
+            $time1 = new DateTime(); 
             $time2 = new DateTime($user["confirmat_{$this->_table}"]);
-            $interval = $time1->diff($time2);
-            $interval = $interval->format('%i');
+            $interval = $time1->diff($time2, true)->i;
+            
             if( $interval > 30 ) {
                 $_SESSION['flash']['success'] = "Le lien de validation à expiré veuillez indiqué de nouveau votre email.";
                 header('location:index.php?controller=utilisateur&task=oublie');
