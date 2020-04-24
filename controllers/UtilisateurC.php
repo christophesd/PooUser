@@ -322,7 +322,8 @@ class UtilisateurC extends Utilisateur {
             
             // Update token et confirmat
             $this->updateInto([
-                "token_{$this->_table}" => $token_utilisateur
+                "token_{$this->_table}" => $token_utilisateur,
+                "confirmat_{$this->_table}" => date("Y-m-d H:i:s")
             ], 'id', $user["id_{$this->_table}"] );
 
 
