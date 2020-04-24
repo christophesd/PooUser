@@ -29,9 +29,9 @@ class UtilisateurC extends Utilisateur {
         $title = 'connexion';
         $btm = 'connexion';
 
-        // Inputs du formulaire
+        // Inputs du formulaire // $name, $table, $placeholder, $phrase, $type
         ob_start();
-        Form::input('email', 'utilisateur', 'exemple@gmail.com', 'email de l\'utilisateur');
+        Form::input('email', 'utilisateur', 'exemple@gmail.com', 'email de l\'utilisateur', 'email');
         Form::input('mdp', 'utilisateur', 'mot de passe', 'mot de passe <small>(<a href="index.php?controller=utilisateur&task=oublie">Vous avez oublié votre mot de passe ?</a>)</small>', 'password');
         $inputs = ob_get_clean();
 
@@ -128,11 +128,11 @@ class UtilisateurC extends Utilisateur {
         $title = 'inscription';
         $btm = 's\'inscrire';
 
-        // Inputs du formulaire
+        // Inputs du formulaire // $name, $table, $placeholder, $phrase, $type
         ob_start();
-        Form::input('nom', 'utilisateur', 'dupont', 'nom de l\'utilisateur');
-        Form::input('prenom', 'utilisateur', 'nicolas', 'prenom de l\'utilisateur');
-        Form::input('email', 'utilisateur', 'exemple@gmail.com', 'email de l\'utilisateur');
+        Form::input('nom', 'utilisateur', 'nom', 'nom de l\'utilisateur');
+        Form::input('prenom', 'utilisateur', 'prenom', 'prenom de l\'utilisateur');
+        Form::input('email', 'utilisateur', 'exemple@gmail.com', 'email de l\'utilisateur', 'email');
         Form::input('mdp', 'utilisateur', 'mot de passe', '', 'password');
         $inputs = ob_get_clean();
 
@@ -270,9 +270,9 @@ class UtilisateurC extends Utilisateur {
         $btm = 'validation';
         $p = 'nous allons vous envoyer un email de validation pour redéfinir votre mot de passe.';
 
-        // Inputs du formulaire
+        // Inputs du formulaire // $name, $table, $placeholder, $phrase, $type
         ob_start();
-        Form::input('email', 'utilisateur', 'exemple@gmail.com', 'email de l\'utilisateur');
+        Form::input('email', 'utilisateur', 'exemple@gmail.com', 'email de l\'utilisateur', 'email');
         $inputs = ob_get_clean();
 
         // Affichage
@@ -373,7 +373,7 @@ class UtilisateurC extends Utilisateur {
         $btm = 'validation';
         $p = 'veuillez saisir un nouveau mot de passe.';
 
-        // Inputs du formulaire
+        // Inputs du formulaire // $name, $table, $placeholder, $phrase, $type
         ob_start();
         Form::input('mdp', 'utilisateur', 'nouveau mot de passe', '', 'password');
         Form::input('mdp2', 'utilisateur', 'nouveau mot de passe', 'confirmation du mot de passe', 'password');

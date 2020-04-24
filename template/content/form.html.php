@@ -5,8 +5,8 @@
             <form action="index.php?controller=<?=$controller?>&task=<?=$task?><?=$get?>" method="POST">
 
                 <div class="form-group text-center">
-                    <h3><?=ucfirst($title)?> :</h3>
-                    <p><small><?=ucfirst($p)?></small></p>
+                    <h3 class='mb-4'><?=ucfirst($title)?> :</h3>
+                    <p class='mb-5'><small><?=ucfirst($p)?></small></p>
                 </div>
 
                 <?=Alert::message()?>
