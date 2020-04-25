@@ -11,6 +11,7 @@ class Alert
 
     public static function setPerso($name , $message, $type = "danger")
     {
+        unset($_SESSION['flash']['perso'][$name]);
         $_SESSION['flash']['perso'][$name][$type] = $message;
         if ($type == 'danger')
         {
@@ -20,6 +21,7 @@ class Alert
 
     public static function setGeneral($message, $type = "danger")
     {
+        unset($_SESSION['flash']['perso']);
         $_SESSION['flash']['general'][$type] = $message;
         if ($type == 'danger')
         {
@@ -54,15 +56,15 @@ class Alert
         {
             foreach ( $_SESSION['flash']['perso'][$name] as $type => $message) 
             {
-                if ($type == 'danger') {
-                ?>
-                    <div class="invalid-feedback">
+                if ($type == 'success') 
+                { ?>
+                    <div class="valid-feedback">
                         <?=$message?>
                     </div>
                 <?php }
-                if ($type == 'success') {
-                ?>
-                    <div class="valid-feedback">
+                if ($type == 'danger') 
+                { ?>
+                    <div class="invalid-feedback">
                         <?=$message?>
                     </div>
                 <?php }
@@ -76,16 +78,17 @@ class Alert
         {
             foreach ( $_SESSION['flash']['perso'][$name] as $type => $message) 
             {
-                if ($type == 'danger') {
-                    echo " class='form-control is-invalid' ";
-                }
                 if ($type == 'success') {
                     echo " class='form-control is-valid' ";
+                }
+                if ($type == 'danger') {
+                    echo " class='form-control is-invalid' ";
                 }
             }
         }
     }
 
+    
     public static function reset()
     {
         unset($_SESSION['flash']);
