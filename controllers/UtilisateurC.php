@@ -48,31 +48,25 @@ class UtilisateurC extends Utilisateur {
         // Init var
         $email_utilisateur = $mdp_utilisateur = $id_utilisateur = "";
 
-        // Fontion test
-        function test_input($data) {
-            $data = trim($data);
-            $data = stripslashes($data);
-            $data = htmlspecialchars($data);
-            return $data;
-        }
-
         // Vérification champs
+        // mdp
         if (empty($_POST["mdp_utilisateur"])) {
-            $_SESSION['flash']['danger'] = "Veuillez saisir votre mot de passe.";
+            Alert::setPerso('mdp', 'Veuillez saisir votre mot de passe.');
         } else {
-            $mdp_utilisateur = test_input($_POST["mdp_utilisateur"]);
+            $mdp_utilisateur = htmlentities($_POST["mdp_utilisateur"], ENT_QUOTES, "UTF-8");
         }
+        // email
         if (empty($_POST["email_utilisateur"])) {
-            $_SESSION['flash']['danger'] = "Veuillez saisir votre email.";
+            Alert::setPerso('email', 'Veuillez saisir votre email.');
         } else {
-            $email_utilisateur = test_input($_POST["email_utilisateur"]);
+            $email_utilisateur = htmlentities($_POST["email_utilisateur"], ENT_QUOTES, "UTF-8");
             if (!filter_var($email_utilisateur, FILTER_VALIDATE_EMAIL)) {
-                $_SESSION['flash']['danger'] = "Le format de l'email invalide.";
+                Alert::setPerso('email', "Le format de l'email invalide.");
             }
         }
 
         // SI TOUT EST OK
-        if ( empty($_SESSION['flash']) AND !empty($email_utilisateur) AND !empty($mdp_utilisateur) ) {
+        if ( Alert::getErr() AND !empty($email_utilisateur) AND !empty($mdp_utilisateur) ) {
 
             // Recherche de l'utilisateur
             $user = $this->findBy('email',$email_utilisateur);
@@ -82,23 +76,25 @@ class UtilisateurC extends Utilisateur {
                     if ( !empty($user["confirmat_{$this->_table}"]) ) {
                         $id_utilisateur = $user["id_{$this->_table}"];
                     } else {
-                        $_SESSION['flash']['danger'] = "Vous n'avez pas validé votre adresse email.";
+                        Alert::setGeneral("Vous n'avez pas validé votre adresse email.");
                     }
                 } else {
-                    $_SESSION['flash']['danger'] = "Votre mot de passe est incorrect.";
+                    Alert::setPerso('mdp', "Votre mot de passe est incorrect.");
+                    Alert::setPerso('email', '', 'success');
                 }
             } else {
-                $_SESSION['flash']['danger'] = "L'email indiqué n'existe pas.";
+                Alert::setPerso('email', "L'email indiqué n'existe pas.");
             }
         }
 
-        if ( empty($_SESSION['flash']) ) {
+        if ( Alert::getErr() ) {
             // Création de la session
             session_start();
             $_SESSION["id_utilisateur"] = $id_utilisateur;
 
             // Redirection
-            $_SESSION['flash']['success'] = "Vous êtes connecté. Nous vous souhaitons une bonne journée !";
+            Alert::resetPerso();
+            Alert::setGeneral("Vous êtes connecté. Nous vous souhaitons une bonne journée !", 'success');
             header('location:index.php');
             exit();
         } else {
@@ -112,7 +108,7 @@ class UtilisateurC extends Utilisateur {
     public function deco()
     {
         unset($_SESSION['id_utilisateur']);
-        $_SESSION['flash']['success'] = "Une bonne journée à vous et à bientôt !<i class='far fa-smile-wink ml-3'></i>";
+        $_SESSION['flash']['general']['success'] = "Une bonne journée à vous et à bientôt !<i class='far fa-smile-wink ml-3'></i>";
         header('Location:index.php');
         exit();
     }
@@ -148,68 +144,74 @@ class UtilisateurC extends Utilisateur {
         $this->redirectIfConnec();
 
         // Init var
-        $nom_utilisateur = $prenom_utilisateur = $email_utilisateur = $mdp_utilisateur = $id_utilisateur = "";
+        $nom_utilisateur = $prenom_utilisateur = $email_utilisateur = $mdp_utilisateur = "";
 
-        // Fontion test
-        function test_input($data) {
-            $data = trim($data);
-            $data = stripslashes($data);
-            $data = htmlspecialchars($data);
-            return $data;
-        }
 
         // Vérification des champs
+        // email
+        if (empty( $_POST["email_utilisateur"]) ) {
+            Alert::setPerso('email', 'Veuillez saisir votre adresse email.');
+        } else {
+            $email_utilisateur = htmlentities($_POST["email_utilisateur"], ENT_QUOTES, "UTF-8");
+
+            // Verif si l'email existe
+            $email_utilisateur_tp = $this->findBy('email', $email_utilisateur);
+            if ( !empty($email_utilisateur_tp) ) {
+                Alert::setGeneral('Vous êtes déja inscrit. Vous pouvez vous connecter ici :', 'success');
+                header('location:index.php?controller=utilisateur&task=connec');
+                exit();
+            }
+
+            if (!filter_var($email_utilisateur, FILTER_VALIDATE_EMAIL)) {
+                Alert::setPerso('email', 'Le format de l\'adresse email est invalide.');
+            } else {
+                Alert::setPerso('email', '', 'success');
+            }
+        }
         // mot de passe
         if ( empty($_POST["mdp_utilisateur"]) ) {
-            $_SESSION['flash']['danger'] = "Veuillez saisir un mot de passe.";
+            Alert::setPerso('mdp', 'Veuillez saisir un mot de passe.');
         } else {
-            $mdp_utilisateur_tp = test_input($_POST["mdp_utilisateur"]);
+            $mdp_utilisateur_tp = $_POST["mdp_utilisateur"];
             if ( !preg_match('#^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$#', $mdp_utilisateur_tp) ) {
-                $_SESSION['flash']['danger'] = "Format du mot de passe invalide.<br>8 caractères minimum avec au minimum 1 majuscule, 1 minuscule et 1 chiffre.";
+                Alert::setPerso('mdp', 'Format du mot de passe invalide.<br>8 caractères minimum avec au minimum 1 majuscule, 1 minuscule et 1 chiffre.');
             } else {
                 $mdp_utilisateur = password_hash($mdp_utilisateur_tp, PASSWORD_DEFAULT);
             }
         }
-        // email
-        if (empty( $_POST["email_utilisateur"]) ) {
-            $_SESSION['flash']['danger'] = "Veuillez saisir votre adresse email.";
+        // nom
+        if (empty($_POST["nom_utilisateur"])) {
+            Alert::setPerso('nom', 'Veuillez saisir votre nom.');
         } else {
-            $email_utilisateur = test_input($_POST["email_utilisateur"]);
-            if (!filter_var($email_utilisateur, FILTER_VALIDATE_EMAIL)) {
-                $_SESSION['flash']['danger'] = "Le format de l'adresse email est invalide.";
+            $nom_utilisateur_tp =  htmlentities($_POST["nom_utilisateur"], ENT_QUOTES, "UTF-8");
+            $nom_utilisateur = mb_strtoupper($nom_utilisateur_tp, 'UTF-8');
+            if ( !preg_match('#^[\p{Latin}\' -]+$#u', $nom_utilisateur) ) {
+                Alert::setPerso('nom', 'Format du nom invalide. Seul les lettres sont autorisés.');
             } else {
-                // REQ 1 ) Verif si l'email existe
-
-                $email_utilisateur_tp = $this->findBy('email', $email_utilisateur);
-
-                if ( !empty($email_utilisateur_tp) ) {
-                    $_SESSION['flash']['danger'] = "Vous êtes déja inscrit. Connectez-vous : <a href='index.php?controller=utilisateur&task=connec'>ICI</a>";
-                }
+                Alert::setPerso('nom', '', 'success');
             }
         }
         // prenom
         if (empty($_POST["prenom_utilisateur"])) {
-            $_SESSION['flash']['danger'] = "Veuillez saisir votre prenom.";
+            Alert::setPerso('prenom', 'Veuillez saisir votre prenom.');
         } else {
-            $prenom_utilisateur = mb_convert_case( test_input($_POST["prenom_utilisateur"]), MB_CASE_TITLE, 'UTF-8');
+            $prenom_utilisateur_tp =  htmlentities($_POST["prenom_utilisateur"], ENT_QUOTES, "UTF-8");
+            $prenom_utilisateur = mb_convert_case($prenom_utilisateur_tp, MB_CASE_TITLE, 'UTF-8');
             if ( !preg_match('#^[\p{Latin}\' -]+$#u', $prenom_utilisateur) ) {
-                $_SESSION['flash']['danger'] = "Format du prenom invalide.<br>Seul les caractères alphanumérique et les accents sont autorisés.";
+                Alert::setPerso('prenom', 'Format du prenom invalide. Seul les lettres sont autorisés.');
+            } else {
+                Alert::setPerso('prenom', '', 'success');
             }
         }
-        // nom
-        if (empty($_POST["nom_utilisateur"])) {
-            $_SESSION['flash']['danger'] = "Veuillez saisir votre nom.";
-        } else {
-            $nom_utilisateur = mb_strtoupper( test_input($_POST["nom_utilisateur"]), 'UTF-8');
-        }
-        
+
+
         // SI TOUT EST OK
-        if ( empty($_SESSION['flash']) AND !empty($nom_utilisateur) AND !empty($prenom_utilisateur) AND !empty($email_utilisateur) AND !empty($mdp_utilisateur) ) {
+        if ( Alert::getErr() AND !empty($nom_utilisateur) AND !empty($prenom_utilisateur) AND !empty($email_utilisateur) AND !empty($mdp_utilisateur) ) {
 
             // Création du token 
             $token_utilisateur = bin2hex( openssl_random_pseudo_bytes(20) );
 
-            // REQ 3 ) Insertion de l'utilisateur
+            // Insertion de l'utilisateur
             $this->insertInto([
                 "email_{$this->_table}" => $email_utilisateur,
                 "prenom_{$this->_table}" => $prenom_utilisateur,
@@ -218,15 +220,15 @@ class UtilisateurC extends Utilisateur {
                 "token_{$this->_table}" => $token_utilisateur
             ]);
 
-            // REQ 4 ) Verif insertion de l'utilisateur
+            // Verif insertion de l'utilisateur
 
             $utilisateur = $this->findBy('email', $email_utilisateur);
             if ( empty($utilisateur["id_{$this->_table}"]) ) {
-                $_SESSION['flash']['danger'] = "Une erreur c'est produite lors de l'insertion dans la base de donnée. Veuillez contacter un administrateur.";
+                Alert::setGeneral("Une erreur c'est produite lors de l'insertion dans la base de donnée. Veuillez contacter un administrateur.");
             }
         }
 
-        if ( empty($_SESSION['flash']) ) {
+        if ( Alert::getErr() ) {
 
             // Envoie du token par mail 
             $to      = $email_utilisateur;
@@ -249,7 +251,8 @@ class UtilisateurC extends Utilisateur {
             mail($to, $subject, $message, $headers);
 
             // Redirection
-            $_SESSION['flash']['success'] = "Inscription réussi ! Veuilliez valider votre compte par mail.";
+            Alert::resetPerso();
+            Alert::setGeneral("Inscription réussi ! Veuilliez valider votre compte par mail.", 'success');
             header('location:index.php?controller=utilisateur&task=connec');
         } else {
             $_SESSION['data'] = compact('nom_utilisateur', 'prenom_utilisateur', 'email_utilisateur');
@@ -286,36 +289,27 @@ class UtilisateurC extends Utilisateur {
         $this->redirectIfConnec();
 
         // Init var
-        $email_utilisateur = $id_utilisateur = "";
-
-        // Fontion test
-        function test_input($data) {
-            $data = trim($data);
-            $data = stripslashes($data);
-            $data = htmlspecialchars($data);
-            return $data;
-        }
+        $email_utilisateur = "";
 
         // Vérification des champs
         // email
         if (empty( $_POST["email_utilisateur"]) ) {
-            $_SESSION['flash']['danger'] = "Veuillez saisir votre adresse email.";
+            Alert::setPerso('email', "Veuillez saisir votre adresse email.");
         } else {
-            $email_utilisateur = test_input($_POST["email_utilisateur"]);
+            $email_utilisateur = htmlentities($_POST["email_utilisateur"], ENT_QUOTES, "UTF-8");
             if (!filter_var($email_utilisateur, FILTER_VALIDATE_EMAIL)) {
-                $_SESSION['flash']['danger'] = "Le format de l'adresse email est invalide.";
+                Alert::setPerso('email', "Le format de l'adresse email est invalide.");
             } else {
                 // Vérif utilisateur
                 $user = $this->findBy('email', $email_utilisateur);
                 if ( empty( $user["email_{$this->_table}"] ) ) {
-                    $_SESSION['flash']['danger'] = "Nous n'avons pas trouvé l'adresse email.";
+                    Alert::setPerso('email', "Nous n'avons pas trouvé l'adresse email.");
                 }
             }
         }
 
-
         // SI TOUT EST OK
-        if ( empty($_SESSION['flash']) AND !empty($email_utilisateur) ) {
+        if ( Alert::getErr() AND !empty($email_utilisateur) ) {
 
             // Création du token 
             $token_utilisateur = bin2hex( openssl_random_pseudo_bytes(20) );
@@ -348,8 +342,9 @@ class UtilisateurC extends Utilisateur {
             mail($to, $subject, $message, $headers);
 
             // Redirection
-            $_SESSION['flash']['success'] = "Email envoyé ! Veuilliez valider votre nouveau mot de passe.";
-            header('location:index.php?controller=utilisateur&task=oublie');
+            Alert::resetPerso();
+            Alert::setGeneral("Email envoyé ! Veuilliez valider votre nouveau mot de passe.", 'success');
+            header('location:index.php?controller=utilisateur&task=connec');
         } else {
             $_SESSION['data'] = compact('email_utilisateur');
             header('location:index.php?controller=utilisateur&task=oublie');
@@ -362,8 +357,8 @@ class UtilisateurC extends Utilisateur {
         $this->redirectIfConnec();
 
         // Redirect si token faux
-        $id = htmlentities($_GET['id']);
-        $token = htmlentities($_GET['token']);
+        $id = htmlentities($_GET['id'], ENT_QUOTES, "UTF-8");
+        $token = htmlentities($_GET['token'], ENT_QUOTES, "UTF-8");
         $this->redirectIfBadToken($id, $token);
 
         // Var du formulaire
@@ -391,50 +386,43 @@ class UtilisateurC extends Utilisateur {
         $this->redirectIfConnec();
 
         // Redirect si token faux
-        $id = htmlentities($_GET['id']);
-        $token = htmlentities($_GET['token']);
+        $id = htmlentities($_GET['id'], ENT_QUOTES, "UTF-8");
+        $token = htmlentities($_GET['token'], ENT_QUOTES, "UTF-8");
         $this->redirectIfBadToken($id, $token);
 
         // Init var
-        $mdp_utilisateur = $id_utilisateur = "";
-
-        // Fontion test
-        function test_input($data) {
-            $data = trim($data);
-            $data = stripslashes($data);
-            $data = htmlspecialchars($data);
-            return $data;
-        }
+        $mdp_utilisateur = "";
 
         // Vérification champs
         if ( empty($_POST["mdp_utilisateur"]) || empty($_POST["mdp2_utilisateur"]) ) {
-            $_SESSION['flash']['danger'] = "Veuillez saisir tous les champs.";
+            Alert::setGeneral("Veuillez saisir tous les champs.");
         } else {
             if ( $_POST["mdp_utilisateur"] != $_POST["mdp2_utilisateur"] ) {
-                $_SESSION['flash']['danger'] = "Veuillez saisir les mêmes mots de passe.";
+                Alert::setGeneral("Veuillez saisir les mêmes mots de passe.");
             } else {
-                $mdp_utilisateur_tp = test_input($_POST["mdp_utilisateur"]);
+                $mdp_utilisateur_tp = $_POST["mdp_utilisateur"];
                 if ( !preg_match('#^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$#', $mdp_utilisateur_tp) ) {
-                    $_SESSION['flash']['danger'] = "Format du mot de passe invalide.<br>8 caractères minimum avec au minimum 1 majuscule, 1 minuscule et 1 chiffre.";
+                    Alert::setGeneral("Format du mot de passe invalide.<br>8 caractères minimum avec au minimum 1 majuscule, 1 minuscule et 1 chiffre.");
                 } else {
                     $mdp_utilisateur = password_hash($mdp_utilisateur_tp, PASSWORD_DEFAULT);
                 }
             }
         }
-
+        
 
         // SI TOUT EST OK
-        if ( empty($_SESSION['flash']) AND !empty($mdp_utilisateur) ) {
+        if ( Alert::getErr() AND !empty($mdp_utilisateur) ) {
 
             // Update mdp, token et confirmat
             $this->updateInto([
                 "mdp_{$this->_table}" => $mdp_utilisateur,
                 "token_{$this->_table}" => NULL,
                 "confirmat_{$this->_table}" => date("Y-m-d H:i:s")
-            ], 'id', $user["id_{$this->_table}"] );
+            ], 'id', $id );
 
             // Redirection
-            $_SESSION['flash']['success'] = "Votre mot de passe à bien été réinitialisé.";
+            Alert::resetPerso();
+            Alert::setGeneral("Votre mot de passe à bien été réinitialisé.", 'success');
             header('location:index.php?controller=utilisateur&task=connec');
             exit();
 
@@ -442,9 +430,6 @@ class UtilisateurC extends Utilisateur {
             header('location:index.php?controller=utilisateur&task=mdp&id='.$id.'&token='.$token.'');
             exit();
         }
-
-
-
 
     }
 
@@ -457,7 +442,7 @@ class UtilisateurC extends Utilisateur {
     public function validt()
     {
         // Vérif utilisateur
-        $user = $this->findBy('id', htmlentities($_GET['id']) );
+        $user = $this->findBy('id', htmlentities($_GET['id'], ENT_QUOTES, "UTF-8") );
 
         // Validation token
         if ( !empty($user) AND 
@@ -471,7 +456,7 @@ class UtilisateurC extends Utilisateur {
             ], 'id', $user["id_{$this->_table}"] );
 
             // Nouvel vérif utilisateur
-            $user = $this->findBy('id', htmlentities($_GET['id']) );
+            $user = $this->findBy('id', htmlentities($_GET['id'], ENT_QUOTES, "UTF-8") );
 
             // Si token validé
             if ($user["token_{$this->_table}"]  == NULL AND 
@@ -482,23 +467,23 @@ class UtilisateurC extends Utilisateur {
                 $_SESSION["id_utilisateur"] = $user["id_{$this->_table}"];
 
                 // Redirection
-                $_SESSION['flash']['success'] = "Votre compte à bien été validé.";
+                Alert::setGeneral("Votre compte à bien été validé.", 'success');
                 header('location:index.php');
                 exit();
             }
         } elseif ( !empty($user["confirmat_{$this->_table}"]) ) {
             // Redirection
             if ( !empty($_SESSION["id_utilisateur"]) ) {
-                $_SESSION['flash']['success'] = "Votre adresse email a déjà été validé.";
+                Alert::setGeneral("Votre adresse email a déjà été validé.", 'success');
                 header('location:index.php');
             } else {
-                $_SESSION['flash']['success'] = "Votre adresse email a déjà été validé. Vous pouvez maintenant vous connecter.";
+                Alert::setGeneral("Votre adresse email a déjà été validé. Vous pouvez maintenant vous connecter.", 'success');
                 header('location:index.php?controller=utilisateur&task=connec');
             }
             exit();
         } else {
             // Redirection
-            $_SESSION['flash']['danger'] = "Le lien de validation est incorrecte.";
+            Alert::setGeneral("Le lien de validation est incorrecte.");
             header('location:index.php?controller=utilisateur&task=connec');
             exit();
         }
@@ -509,7 +494,7 @@ class UtilisateurC extends Utilisateur {
     {
         if ( !empty($_SESSION["id_utilisateur"]) ) 
         {
-            $_SESSION['flash']['success'] = "Vous êtes déjà connecté.";
+            Alert::setGeneral("Vous êtes déjà connecté.", 'success');
             header('location:index.php');
             exit();
         }
@@ -522,7 +507,7 @@ class UtilisateurC extends Utilisateur {
             $token != $user["token_{$this->_table}"] ||
             empty($user["confirmat_{$this->_table}"]) ) 
         {
-            $_SESSION['flash']['success'] = "Vous ne pouvez pas accèder à cette page.";
+            $_SESSION['flash']['general']['danger'] = "Vous ne pouvez pas accèder à cette page.";
             header('location:index.php');
             exit();
         } else {
@@ -531,7 +516,7 @@ class UtilisateurC extends Utilisateur {
             $interval = $time1->diff($time2, true)->i;
             
             if( $interval > 30 ) {
-                $_SESSION['flash']['success'] = "Le lien de validation à expiré veuillez indiqué de nouveau votre email.";
+                Alert::setGeneral("Le lien de validation à expiré veuillez indiqué de nouveau votre email.");
                 header('location:index.php?controller=utilisateur&task=oublie');
                 exit();
             }

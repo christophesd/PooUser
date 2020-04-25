@@ -9,9 +9,11 @@
                     <p class='mb-5'><small><?=ucfirst($p)?></small></p>
                 </div>
 
-                <?=Alert::message()?>
+                <?=Alert::general()?>
 
                 <?=$inputs?>
+
+                <?=Alert::reset()?>
 
                 <button type="submit" class="btn btn-primary"><?=ucfirst($btm)?></button>
 
