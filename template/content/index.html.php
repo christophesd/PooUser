@@ -1,7 +1,7 @@
 <div class="container mt-5">
 
-    <?=Alert::general();?>
-    <?=Alert::reset();?>
+    <?=Alert::general()?>
+    <?=Alert::reset()?>
     
     <h1>Accueil</h1>
 
