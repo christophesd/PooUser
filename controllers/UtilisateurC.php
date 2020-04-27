@@ -55,7 +55,7 @@ class UtilisateurC extends Utilisateur {
         if (empty($_POST["mdp_utilisateur"])) {
             Alert::setPerso('mdp', 'Veuillez saisir votre mot de passe.');
         } else {
-            $mdp_utilisateur = htmlentities($_POST["mdp_utilisateur"], ENT_QUOTES, "UTF-8");
+            $mdp_utilisateur = $_POST["mdp_utilisateur"];
         }
         // email
         $email_utilisateur = Validation::verifEmail();
@@ -67,7 +67,6 @@ class UtilisateurC extends Utilisateur {
             // Recherche de l'utilisateur
             $user = $this->findBy('email',$email_utilisateur);
             if ( $user["email_{$this->_table}"] == $email_utilisateur ) {
-                $error = false;
                 if ( password_verify($mdp_utilisateur, $user["mdp_{$this->_table}"]) ) {
                     if ( !empty($user["confirmat_{$this->_table}"]) ) {
                         $id_utilisateur = $user["id_{$this->_table}"];

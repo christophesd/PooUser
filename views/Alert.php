@@ -30,7 +30,6 @@ class Alert
     }
     
 
-
     public static function general()
     {
         if ( !empty($_SESSION['flash']['general']) ) 
